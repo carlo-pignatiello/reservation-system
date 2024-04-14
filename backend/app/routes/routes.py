@@ -25,14 +25,11 @@ def signup(session: Session = Depends(get_db)):
 
 @order_router.post("/events/book")
 def book_event(reservations_body: List[Booking], session: Session = Depends(get_db)):
-    no_reservation = {}
+    reservation = {}
     check_type_of_event = [i.event_id for i in reservations_body]
     if len(set(check_type_of_event)) != len(reservations_body):
         return {"status": "please book max three tickets for an event"}
     for book in reservations_body:
-        flag = book_tickets(session, book.email, book.event_id, book.ticket_no)
-        if flag:
-            no_reservation[book.event_id] = "True"
-        else: 
-            no_reservation[book.event_id] = "False"
-    return {"book_status": no_reservation}
+        message = book_tickets(session, book.email, book.event_id, book.ticket_no)
+        reservation[book.event_id] = message
+    return {"book_status": reservation}
