@@ -1,11 +1,10 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
-from models.models import Base
-from database import SessionLocal, engine
-from repos.repos import find_all_event, book_tickets
+from fastapi import APIRouter, Depends
+from database import SessionLocal
+from repos import find_all_event, book_tickets
 from sqlalchemy.orm import Session
-from schemas.schemas import Booking
-Base.metadata.create_all(bind=engine)
+from schemas import Booking
+# Base.metadata.create_all(bind=engine)
 
 
 # Dependency
