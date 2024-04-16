@@ -14,22 +14,28 @@
    docker-compose up -d
 
 2. **Navigate to backend**
-   ```cd backend
+   ```bash
+   cd backend
 
 3. **Activate Virtual Environment**
-    ```source venv/bin/activate
+    ```bash
+    source venv/bin/activate
 
 4. **Install Backend Dependencies**
-    ```pip install -r backend/requirements.txt
+    ```bash
+    pip install -r backend/requirements.txt
 
 5. **Create Alembic Revision**
-    ```alembic revision --autogenerate -m "Create schema and insert test data"
+    ```bash
+    alembic revision --autogenerate -m "Create schema and insert test data"
 
 6. **Apply Alembic Migration**
-    ```alembic upgrade head
+    ```bash
+    alembic upgrade head
 
 7. **Start server**
-    ```python app/main.py
+    ```bash
+    python app/main.py
 
 ### Troubleshooting NoModuleFindError:
 ```export PYTHONPATH=/path/to/your/project
