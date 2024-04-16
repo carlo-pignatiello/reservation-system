@@ -9,28 +9,27 @@
 
 **Steps:**
 
-1. **Clone or Download Project**
-    * (Describe how to clone or download your project, specific to your version control system)
-
-2. **Navigate to Project Directory**
-    * Open a terminal and use `cd` to navigate to the project directory.
-
 3. **Start Docker Services (Background Mode)**
-
    ```bash
-   docker-compose up -d```
+   docker-compose up -d
 
-4. **Activate Virtual Environment**
-    ```source venv/bin/activate```
+2. **Navigate to backend**
+   ```cd backend
 
-5. **Install Backend Dependencies**
-    ```pip install -r backend/requirements.txt```
+3. **Activate Virtual Environment**
+    ```source venv/bin/activate
 
-6. **Create Alembic Revision**
-    ```alembic revision --autogenerate -m "Create schema and insert test data"```
+4. **Install Backend Dependencies**
+    ```pip install -r backend/requirements.txt
 
-7. **Apply Alembic Migration**
-    ```alembic upgrade head```
+5. **Create Alembic Revision**
+    ```alembic revision --autogenerate -m "Create schema and insert test data"
+
+6. **Apply Alembic Migration**
+    ```alembic upgrade head
+
+7. **Start server**
+    ```python app/main.py
 
 ### Troubleshooting NoModuleFindError:
-```export PYTHONPATH=/path/to/your/project```
+```export PYTHONPATH=/path/to/your/project
