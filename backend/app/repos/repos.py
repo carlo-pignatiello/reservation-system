@@ -1,11 +1,11 @@
 from typing import Optional
 import sqlalchemy
-from models import Customer, Event, Reservation
-from schemas import CustomerSchema, EventSchema
+from app.models import Customer, Event, Reservation
+from app.schemas import CustomerSchema, EventSchema
 from sqlalchemy.orm import Session
-from logger import logger
-from exceptions import NoEventError
-from utils import retry
+from app.logger import logger
+from app.utils import retry
+from app.exceptions import NoCustomerExistanceException, NoEventException
 
 def find_all_event(session: Session):
     e = session.query(Event).all()
@@ -14,16 +14,15 @@ def find_all_event(session: Session):
 def check_email(session: Session, email: str) -> int:
     customer_id = session.query(Customer).filter(Customer.email == email).first()
     if not customer_id:
-        new_customer = Customer(email=email) 
-        session.add(new_customer)
+        raise NoCustomerExistanceException(message="No customer with this email")
     customer = session.query(Customer).filter(Customer.email == email).first()
     customer = CustomerSchema.model_validate(customer)
     return customer.id
 
-def get_event(session: Session, event_id: int) -> Optional[EventSchema]:
+def get_event(session: Session, event_id: int) -> EventSchema:
     event = session.query(Event).filter(Event.id == event_id).first()
     if not event:
-        return None
+        raise NoEventException(message="No event with this name")
     event = EventSchema.model_validate(event)
     return event
 
@@ -33,10 +32,9 @@ def book_tickets(session: Session, email: str, event_id: int, tickets_no: int) -
         session.connection(execution_options={"isolation_level": "SERIALIZABLE"})
         customer_id = check_email(session, email)
         event = get_event(session, event_id)
-        if event:
-            tickets_booked = booking_transaction(session, event, tickets_no, customer_id)
-            return tickets_booked
-        raise NoEventError()
+        tickets_booked = booking_transaction(session, event, tickets_no, customer_id)
+        return tickets_booked
+        
 
 def booking_transaction(session: Session, event: EventSchema, tickets_no: int, customer_id: int) -> Optional[list]:
     try:

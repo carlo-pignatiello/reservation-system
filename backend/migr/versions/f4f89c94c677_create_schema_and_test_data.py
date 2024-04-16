@@ -1,8 +1,8 @@
-"""Create schema
+"""Create schema and test data
 
-Revision ID: 7df23d4fa1af
+Revision ID: f4f89c94c677
 Revises: 
-Create Date: 2024-04-15 21:37:55.574866
+Create Date: 2024-04-16 20:36:36.644225
 
 """
 from typing import Sequence, Union
@@ -10,13 +10,14 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import orm
+
 from app.models import Customer, Event
 
 bind = op.get_bind()
 session = orm.Session(bind=bind)
 
 # revision identifiers, used by Alembic.
-revision: str = '7df23d4fa1af'
+revision: str = 'f4f89c94c677'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
