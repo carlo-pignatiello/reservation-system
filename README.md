@@ -37,5 +37,6 @@
     ```bash
     python app/main.py
 
-### Troubleshooting NoModuleFindError:
-```export PYTHONPATH=/path/to/your/project
+### Troubleshooting ModuleNotFoundError :
+```bash
+export PYTHONPATH=/path/to/your/project
