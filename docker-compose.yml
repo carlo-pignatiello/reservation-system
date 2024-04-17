@@ -15,6 +15,25 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  web-server:
+    restart: always
+    container_name: web-server
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: web-server
+    ports:
+      - 4557:4557
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DATABASE: "${POSTGRES_DATABASE}"
+      POSTGRES_HOST: "${POSTGRES_HOST}"
+      POSTGRES_PORT: "${POSTGRES_PORT}"
+    command: ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port 4557"]
+    profiles:
+      - server
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
