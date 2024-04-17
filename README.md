@@ -39,4 +39,4 @@
 
 ### Troubleshooting ModuleNotFoundError :
 ```bash
-export PYTHONPATH=/path/to/your/project
+ export PYTHONPATH="${PYTHONPATH}:/app"
