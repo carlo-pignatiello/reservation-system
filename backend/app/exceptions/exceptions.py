@@ -18,9 +18,9 @@ class NoCustomerExistanceException(CustomException):
 
 
 class NoEventException(CustomException):
-    code = HTTPStatus.BAD_REQUEST
-    error_code = HTTPStatus.BAD_REQUEST
-    message = HTTPStatus.BAD_REQUEST.description
+    code = HTTPStatus.NOT_FOUND
+    error_code = HTTPStatus.NOT_FOUND
+    message = HTTPStatus.NOT_FOUND.description
 
 
 class NoDoubleEventException(CustomException):
@@ -30,6 +30,6 @@ class NoDoubleEventException(CustomException):
 
 
 class TicketNotAvailableException(CustomException):
-    code = HTTPStatus.BAD_REQUEST
-    error_code = HTTPStatus.BAD_REQUEST
-    message = HTTPStatus.BAD_REQUEST.description
+    code = HTTPStatus.NOT_FOUND
+    error_code = HTTPStatus.NOT_FOUND
+    message = HTTPStatus.NOT_FOUND.description

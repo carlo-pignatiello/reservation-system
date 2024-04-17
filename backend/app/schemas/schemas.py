@@ -1,9 +1,9 @@
 from typing import List
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
 
 
 class Booking(BaseModel):
-    email: str
+    email: EmailStr
     event_id: int
     ticket_no: int = Field(gt=0, le=3)
 

@@ -1,4 +1,6 @@
-# reservation-system
+# Reservation-system
+
+This project represents a prototype web-server for managing a reservation system. It is necessary to follow the instructions to configure the environment and start the web-server. The core of the reservation system is represented by compliance with the ACID principles.
 
 ## Project Setup Instructions
 
