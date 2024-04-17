@@ -1,8 +1,8 @@
-from typing import Tuple
-import sqlalchemy
+from typing import List, Tuple
+from sqlalchemy import select, update, and_
 from app.models import Customer, Event, Reservation
-from app.schemas import CustomerSchema, EventSchema
-from sqlalchemy.orm import Session
+from app.schemas import CustomerSchema, EventSchema, EventBaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.logger import logger
 from app.utils import retry
 from app.exceptions import (
@@ -10,82 +10,87 @@ from app.exceptions import (
     NoEventException,
     TicketNotAvailableException,
 )
-from app.schemas.schemas import ReservationSchema
+from app.schemas.schemas import ReservationSchema, mapper_list_to_events
 
 
-def find_all_event(session: Session):
-    e = session.query(Event).all()
-    return e
+async def find_all_event(session: AsyncSession) -> List[EventBaseModel]:
+    res = await session.execute(select(Event))
+    events = res.fetchall()
+    if not events:
+        raise NoEventException(message="No event with this name")
+    return mapper_list_to_events(list(events))
 
 
-def check_email(session: Session, email: str) -> int:
-    customer_id = session.query(Customer).filter(Customer.email == email).first()
-    if not customer_id:
+async def check_email(session: AsyncSession, email: str) -> int:
+    res = await session.execute(select(Customer).where(Customer.email == email))
+    customer = res.first()
+    if not customer:
         raise NoCustomerExistanceException(message="No customer with this email")
-    customer = session.query(Customer).filter(Customer.email == email).first()
-    customer = CustomerSchema.model_validate(customer)
+    customer = CustomerSchema.model_validate(customer[0])
     return customer.id
 
 
-def get_event(session: Session, event_id: int) -> EventSchema:
-    event = session.query(Event).filter(Event.id == event_id).first()
+async def get_event(session: AsyncSession, event_id: int) -> EventSchema:
+    res = await session.execute(select(Event).where(Event.id == event_id))
+    event = res.first()
     if not event:
         raise NoEventException(message="No event with this name")
-    event = EventSchema.model_validate(event)
+    event = EventSchema.model_validate(event[0])
     return event
 
 
-@retry(
-    times=3, exceptions=(sqlalchemy.exc.OperationalError, TicketNotAvailableException)
-)
-def book_tickets(
-    session: Session, email: str, event_id: int, tickets_no: int
+@retry(times=3, exceptions=(Exception, TicketNotAvailableException))
+async def book_tickets(
+    session: AsyncSession, email: str, event_id: int, tickets_no: int
 ) -> Tuple[list, int, str]:
-    with session.begin():
-        # session.connection(execution_options={"isolation_level": "SERIALIZABLE"})
-        customer_id = check_email(session, email)
-        event = get_event(session, event_id)
-        tickets_booked, reservation_id = booking_transaction(
+    async with session.begin():
+        # await session.connection(execution_options={"isolation_level": "SERIALIZABLE"})
+        customer_id = await check_email(session, email)
+        event = await get_event(session, event_id)
+        tickets_booked, reservation_id = await booking_transaction(
             session, event, tickets_no, customer_id
         )
         return tickets_booked, reservation_id, event.name
 
 
-def booking_transaction(
-    session: Session, event: EventSchema, tickets_no: int, customer_id: int
+async def booking_transaction(
+    session: AsyncSession, event: EventSchema, tickets_no: int, customer_id: int
 ) -> Tuple[list, int]:
     try:
         current_version = event.version
-        res = (
-            session.query(Event)
-            .filter(
-                sqlalchemy.and_(
+        stmt = (
+            update(Event)
+            .where(
+                and_(
                     Event.id == event.id,
                     Event.version == current_version,
                     Event.seats >= tickets_no,
                 )
             )
-            .update(
+            .values(
                 {
                     Event.seats: Event.seats - tickets_no,
                     Event.version: Event.version + 1,
                 }
             )
         )
-        if not res:
+        res = await session.execute(stmt)
+        rowcount = res.rowcount
+        logger.info(f"{rowcount}")
+        if not rowcount:
             raise TicketNotAvailableException(message="Ticket not available")
         r = Reservation(
             seats_booked=tickets_no, event_id=event.id, customer_id=customer_id
         )
         session.add(r)
-        session.flush()
-        session.refresh(r)
+        await session.flush()
+        await session.refresh(r)
         reservation = ReservationSchema.model_validate(r)
         return list(
             range(event.seats - tickets_no + 1, event.seats + 1)
         ), reservation.id
 
-    except sqlalchemy.exc.OperationalError as e:
+    except Exception as e:  # sqlalchemy.exc.OperationalError
         logger.error("Ticket already booked")
-        session.rollback()
+        await session.rollback()
         raise e

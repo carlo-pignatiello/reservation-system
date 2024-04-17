@@ -1,5 +1,6 @@
 from typing import List
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from sqlalchemy import Row
 
 
 class Booking(BaseModel):
@@ -36,9 +37,19 @@ class Ticket(BaseModel):
     reservation_order: int
 
 
-# def map_to_event(d: Event) -> EventSchema:
-#     print(d.as)
-#     return EventSchema.model_validate(d.as)
+class EventBaseModel(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    seats: int
+    name: str
 
-# def map_to_events(events: list) -> List[EventSchema]:
-#     return [map_to_event(i) for i in events]
+
+def mapper_row_to_event(r: Row) -> EventBaseModel:
+    if isinstance(r, Row):
+        return EventBaseModel.model_validate(r[0])
+    else:
+        raise TypeError("Mapper row to event needs EventBaseModel")
+
+
+def mapper_list_to_events(rows: List[Row]):
+    return [mapper_row_to_event(r) for r in rows]

@@ -1,3 +1,3 @@
-from .database import Base, SessionLocal
+from .database import Base, get_session
 
-__all__ = ["Base", "SessionLocal"]
+__all__ = ["Base", "get_session"]

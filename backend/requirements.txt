@@ -7,3 +7,4 @@ alembic==1.13.1
 python-dotenv==1.0.1
 pre-commit==3.7.0
 email-validator==2.1.1
+asyncpg==0.29.0
