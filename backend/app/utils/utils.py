@@ -1,5 +1,6 @@
 from logger import logger
 
+
 def retry(times, exceptions):
     """
     Retry Decorator
@@ -10,6 +11,7 @@ def retry(times, exceptions):
     :param Exceptions: Lists of exceptions that trigger a retry attempt
     :type Exceptions: Tuple of Exceptions
     """
+
     def decorator(func):
         def newfn(*args, **kwargs):
             attempt = 0
@@ -18,10 +20,12 @@ def retry(times, exceptions):
                     return func(*args, **kwargs)
                 except exceptions:
                     logger.error(
-                        'Exception thrown when attempting to run %s, attempt '
-                        '%d of %d' % (func, attempt, times)
+                        "Exception thrown when attempting to run %s, attempt "
+                        "%d of %d" % (func, attempt, times)
                     )
                     attempt += 1
             return func(*args, **kwargs)
+
         return newfn
+
     return decorator

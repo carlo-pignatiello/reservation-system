@@ -12,7 +12,7 @@ for i in {1..100}; do
         "email": "carlo@prova.it",
         "event_id": 2,
         "ticket_no": 3
-      }, 
+      },
       {
         "email": "marco@prova.it",
         "event_id": 3,
