@@ -19,7 +19,7 @@ def retry(times, exceptions):
                 try:
                     return func(*args, **kwargs)
                 except exceptions:
-                    logger.error(
+                    logger.info(
                         "Exception thrown when attempting to run %s, attempt "
                         "%d of %d" % (func, attempt, times)
                     )

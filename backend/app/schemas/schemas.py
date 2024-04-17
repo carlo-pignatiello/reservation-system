@@ -13,6 +13,7 @@ class EventSchema(BaseModel):
     id: int
     seats: int
     name: str
+    version: int
 
 
 class CustomerSchema(BaseModel):

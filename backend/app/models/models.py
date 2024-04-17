@@ -9,6 +9,7 @@ class Event(Base):
     id = Column(Integer, primary_key=True)
     seats = Column(Integer)
     name = Column(String)
+    version = Column(Integer)
 
 
 class Customer(Base):

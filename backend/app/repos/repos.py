@@ -42,7 +42,7 @@ def book_tickets(
     session: Session, email: str, event_id: int, tickets_no: int
 ) -> Tuple[list, int, str]:
     with session.begin():
-        session.connection(execution_options={"isolation_level": "SERIALIZABLE"})
+        # session.connection(execution_options={"isolation_level": "SERIALIZABLE"})
         customer_id = check_email(session, email)
         event = get_event(session, event_id)
         tickets_booked, reservation_id = booking_transaction(
@@ -55,6 +55,25 @@ def booking_transaction(
     session: Session, event: EventSchema, tickets_no: int, customer_id: int
 ) -> Tuple[list, int]:
     try:
+        current_version = event.version
+        res = (
+            session.query(Event)
+            .filter(
+                sqlalchemy.and_(
+                    Event.id == event.id,
+                    Event.version == current_version,
+                    Event.seats >= tickets_no,
+                )
+            )
+            .update(
+                {
+                    Event.seats: Event.seats - tickets_no,
+                    Event.version: Event.version + 1,
+                }
+            )
+        )
+        if not res:
+            raise TicketNotAvailableException(message="Ticket not available")
         r = Reservation(
             seats_booked=tickets_no, event_id=event.id, customer_id=customer_id
         )
@@ -62,14 +81,10 @@ def booking_transaction(
         session.flush()
         session.refresh(r)
         reservation = ReservationSchema.model_validate(r)
-        new_seats_counter = event.seats - tickets_no
-        if new_seats_counter > 0:
-            session.query(Event).filter(Event.id == event.id).update(
-                {Event.seats: Event.seats - tickets_no}
-            )
-            return list(range(new_seats_counter + 1, event.seats + 1)), reservation.id
-        else:
-            raise TicketNotAvailableException(message="Ticket not available")
+        return list(
+            range(event.seats - tickets_no + 1, event.seats + 1)
+        ), reservation.id
+
     except sqlalchemy.exc.OperationalError as e:
         logger.error("Ticket already booked")
         session.rollback()
