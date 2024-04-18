@@ -20,8 +20,9 @@ This project represents a prototype web-server for managing a reservation system
    ```bash
    $ cd backend
 
-3. **Activate Virtual Environment**
+3. **Create and activate Virtual Environment**
     ```bash
+    $ python3 -m venv venv
     $ source venv/bin/activate
 
 4. **Install Backend Dependencies**
