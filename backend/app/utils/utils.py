@@ -2,14 +2,11 @@ from app.logger import logger
 
 
 def retry(times, exceptions):
-    """
-    Retry Decorator
-    Retries the wrapped function/method `times` times if the exceptions listed
-    in ``exceptions`` are thrown
-    :param times: The number of times to repeat the wrapped function/method
-    :type times: Int
-    :param Exceptions: Lists of exceptions that trigger a retry attempt
-    :type Exceptions: Tuple of Exceptions
+    """_summary_
+
+    Args:
+        times (_type_): _description_
+        exceptions (_type_): _description_
     """
 
     def decorator(func):
