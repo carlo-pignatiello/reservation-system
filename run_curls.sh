@@ -7,19 +7,23 @@ for i in {1..100}; do
     'http://localhost:4557/events/book' \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
-    -d '[
-      "email": "user@example.com",
+    -d '{
+      "email": "carlo@prova.it",
       "ticket": [
         {
-          "event_id": 2,
-          "ticket_no": 2
+          "event_id": 1,
+          "ticket_no": 1
         },
         {
-          "event_id": 1,
+          "event_id": 2,
           "ticket_no": 3
         },
-  ]
-    ]' # Extract the message body using jq (assuming it's a JSON message)
+      {
+          "event_id": 3,
+          "ticket_no": 3
+        }
+      ]
+    }' # Extract the message body using jq (assuming it's a JSON message)
   message=$(echo "$response" | jq -r '.message')
   printf "\n"
 done
