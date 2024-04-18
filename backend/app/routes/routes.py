@@ -40,15 +40,15 @@ async def book_event(
     This function is an asynchronous handler for the `/events/book` endpoint.
     It takes a list of `Booking` objects representing the event bookings.
     It raises `NoDoubleEventException` if a booking attempts to reserve
-    more than one ticket for the same event.
+    more than one ticket for the same event in different order.
 
     Args:
         reservations_body: A list of `Booking` objects containing booking details.
         session: An asynchronous database session dependency (injected).
 
     Returns:
-        A dictionary mapping event names to their corresponding booking details,
-        including email, reserved tickets, and order number.
+        A dictionary, with email, mapping event names to their corresponding booking details,
+        including reserved tickets and order number.
     """
     reservation = []
     orders = reservations_body.ticket
