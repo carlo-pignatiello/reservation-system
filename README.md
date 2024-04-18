@@ -6,8 +6,9 @@ This project represents a prototype web-server for managing a reservation system
 
 **Prerequisites:**
 
-* Docker: [Install Docker](https://docs.docker.com/engine/install/)
-* `docker-compose` (install with `pip install docker-compose`)
+* Docker
+* `docker-compose`
+* python3
 
 **Steps:**
 
