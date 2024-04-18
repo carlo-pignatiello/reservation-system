@@ -27,15 +27,11 @@ This project represents a prototype web-server for managing a reservation system
     ```bash
     pip install -r backend/requirements.txt
 
-5. **Create Alembic Revision**
-    ```bash
-    alembic revision --autogenerate -m "Create schema and insert test data"
-
-6. **Apply Alembic Migration**
+5. **Apply Alembic Migration**
     ```bash
     alembic upgrade head
 
-7. **Start server**
+6. **Start server**
     ```bash
     python app/main.py
 

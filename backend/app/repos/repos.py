@@ -1,10 +1,11 @@
+import random
+import time
 from typing import List, Tuple
 from sqlalchemy import select, update, and_
 from app.models import Customer, Event, Reservation
 from app.schemas import CustomerSchema, EventSchema, EventBaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.logger import logger
-from app.utils import retry
 from app.exceptions import (
     NoCustomerExistanceException,
     NoEventException,
@@ -39,7 +40,7 @@ async def get_event(session: AsyncSession, event_id: int) -> EventSchema:
     return event
 
 
-@retry(times=3, exceptions=(Exception, TicketNotAvailableException))
+# @retry(times=3, exceptions=TicketNotAvailableError)
 async def book_tickets(
     session: AsyncSession, email: str, event_id: int, tickets_no: int
 ) -> Tuple[list, int, str]:
@@ -56,29 +57,34 @@ async def book_tickets(
 async def booking_transaction(
     session: AsyncSession, event: EventSchema, tickets_no: int, customer_id: int
 ) -> Tuple[list, int]:
-    try:
-        current_version = event.version
-        stmt = (
-            update(Event)
-            .where(
-                and_(
-                    Event.id == event.id,
-                    Event.version == current_version,
-                    Event.seats >= tickets_no,
-                )
-            )
-            .values(
-                {
-                    Event.seats: Event.seats - tickets_no,
-                    Event.version: Event.version + 1,
-                }
+    current_version = event.version
+    stmt = (
+        update(Event)
+        .where(
+            and_(
+                Event.id == event.id,
+                Event.version == current_version,
+                Event.seats >= tickets_no,
             )
         )
+        .values(
+            {
+                Event.seats: Event.seats - tickets_no,
+                Event.version: Event.version + 1,
+            }
+        )
+    )
+    attemp = 0
+    while attemp < 5:
         res = await session.execute(stmt)
         rowcount = res.rowcount
-        logger.info(f"{rowcount}")
         if not rowcount:
-            raise TicketNotAvailableException(message="Ticket not available")
+            logger.info(f"Counter {attemp}")
+            attemp += 1
+            delay = 0.001 * (2**attemp + random.uniform(0, 1))
+            logger.info(f"Sleeping for {delay}s...")
+            time.sleep(delay)
+            continue
         r = Reservation(
             seats_booked=tickets_no, event_id=event.id, customer_id=customer_id
         )
@@ -89,8 +95,11 @@ async def booking_transaction(
         return list(
             range(event.seats - tickets_no + 1, event.seats + 1)
         ), reservation.id
+    else:
+        raise TicketNotAvailableException(
+            message="Ticket already booked", event_id=event.id
+        )
 
-    except Exception as e:  # sqlalchemy.exc.OperationalError
-        logger.error("Ticket already booked")
-        await session.rollback()
-        raise e
+    # except TicketNotAvailableError as e:  # sqlalchemy.exc.OperationalError
+    #     await session.rollback()
+    #     raise TicketNotAvailableException(message="Ticket already booked")
