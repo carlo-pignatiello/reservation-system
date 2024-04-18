@@ -5,6 +5,17 @@ from sqlalchemy import pool
 
 from alembic import context
 from app.models.models import Base
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+user = os.getenv("POSTGRES_USER", "NA")
+password = os.getenv("POSTGRES_PASSWORD", "NA")
+database = os.getenv("POSTGRES_DATABASE", "NA")
+host = os.getenv("POSTGRES_HOST", "NA")
+port = os.getenv("POSTGRES_PORT", "NA")
+db_uri = f"postgresql://{user}:{password}@localhost:5432/{database}"
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -20,7 +31,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = Base.metadata
-
+config.set_main_option("sqlalchemy.url", db_uri)
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
