@@ -1,4 +1,4 @@
-from logger import logger
+from app.logger import logger
 
 
 def retry(times, exceptions):
@@ -17,6 +17,7 @@ def retry(times, exceptions):
             attempt = 0
             while attempt < times:
                 try:
+                    logger.info(f"Attemp: {attempt}/{times}")
                     return func(*args, **kwargs)
                 except exceptions:
                     logger.info(

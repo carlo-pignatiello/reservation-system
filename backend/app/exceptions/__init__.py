@@ -4,6 +4,7 @@ from .exceptions import (
     NoDoubleEventException,
     CustomException,
     TicketNotAvailableException,
+    TicketNotAvailableError,
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "NoDoubleEventException",
     "CustomException",
     "TicketNotAvailableException",
+    "TicketNotAvailableError",
 ]

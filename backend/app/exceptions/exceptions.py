@@ -33,3 +33,12 @@ class TicketNotAvailableException(CustomException):
     code = HTTPStatus.NOT_FOUND
     error_code = HTTPStatus.NOT_FOUND
     message = HTTPStatus.NOT_FOUND.description
+
+    def __init__(self, message: str = "", event_id: int = -1):
+        self.event_id = event_id
+        self.message = message + " for event_no: " + str(self.event_id)
+
+
+class TicketNotAvailableError(Exception):
+    def __init__(self, message="Ticket already booked"):
+        self.message = message
