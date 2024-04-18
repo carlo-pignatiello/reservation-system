@@ -50,7 +50,6 @@ async def book_event(
         A dictionary mapping event names to their corresponding booking details,
         including email, reserved tickets, and order number.
     """
-    reservation = {}
     orders = reservations_body.ticket
     check_type_of_event = [i.event_id for i in orders]
     if len(set(check_type_of_event)) != len(orders):
@@ -61,10 +60,9 @@ async def book_event(
         tickets, reservation_id, event_name = await book_tickets(
             session, reservations_body.email, ticket.event_id, ticket.ticket_no
         )
-
     return {
         "email": reservations_body.email,
-        reservation[event_name]: {
+        event_name: {
             "tickets_seats": tickets,
             "order_no": reservation_id,
         },
