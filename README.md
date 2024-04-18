@@ -27,7 +27,7 @@ This project represents a prototype web-server for managing a reservation system
 
 4. **Install Backend Dependencies**
     ```bash
-    $ pip install -r backend/requirements.txt
+    $ pip install -r requirements.txt
 
 5. **Apply Alembic Migration**
     ```bash
