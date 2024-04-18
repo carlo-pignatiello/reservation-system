@@ -39,5 +39,6 @@ This project represents a prototype web-server for managing a reservation system
     $ python app/main.py
     or
     $ docker-compose --profile server up --build -d
+ 7. Navigate to localhost:4557/docs
 
  
