@@ -3,10 +3,14 @@ from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from sqlalchemy import Row
 
 
-class Booking(BaseModel):
-    email: EmailStr
+class Transaction(BaseModel):
     event_id: int
     ticket_no: int = Field(gt=0, le=3)
+
+
+class Booking(BaseModel):
+    email: EmailStr
+    ticket: List[Transaction]
 
 
 class EventSchema(BaseModel):

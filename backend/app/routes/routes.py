@@ -1,4 +1,3 @@
-from typing import List
 from fastapi import APIRouter, Depends
 from app.database import get_session
 from app.repos import find_all_event, book_tickets
@@ -34,7 +33,7 @@ async def find_all(session: AsyncSession = Depends(get_session)):
 
 @order_router.post("/events/book")
 async def book_event(
-    reservations_body: List[Booking], session: AsyncSession = Depends(get_session)
+    reservations_body: Booking, session: AsyncSession = Depends(get_session)
 ):
     """Books tickets for multiple events specified in the request body.
 
@@ -52,18 +51,21 @@ async def book_event(
         including email, reserved tickets, and order number.
     """
     reservation = {}
-    check_type_of_event = [i.event_id for i in reservations_body]
-    if len(set(check_type_of_event)) != len(reservations_body):
+    orders = reservations_body.ticket
+    check_type_of_event = [i.event_id for i in orders]
+    if len(set(check_type_of_event)) != len(orders):
         raise NoDoubleEventException(
-            message="Please book max three tickets for an event"
+            message="Please book book one event for transaction"
         )
-    for ticket in reservations_body:
+    for ticket in orders:
         tickets, reservation_id, event_name = await book_tickets(
-            session, ticket.email, ticket.event_id, ticket.ticket_no
+            session, reservations_body.email, ticket.event_id, ticket.ticket_no
         )
-        reservation[event_name] = {
-            "email": ticket.email,
+
+    return {
+        "email": reservations_body.email,
+        reservation[event_name]: {
             "tickets_seats": tickets,
             "order_no": reservation_id,
-        }
-    return reservation
+        },
+    }
