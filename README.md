@@ -34,6 +34,8 @@ This project represents a prototype web-server for managing a reservation system
 6. **Start server**
     ```bash
     python app/main.py
+    or
+    docker-compose --profile server up --build -d
 
 ### Troubleshooting ModuleNotFoundError :
 ```bash
